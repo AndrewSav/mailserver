@@ -97,7 +97,7 @@ init_ldap: init_openldap init_redis
 		-e LDAP_SENDER_ATTRIBUTE="mail" \
 		-e LDAP_DOVECOT_USER_ATTRS="home=/var/mail/vhosts/%{user|domain}/%{user|username}/,mail_driver=maildir,mail_path=/var/mail/vhosts/%{user|domain}/%{user|username}/mail/,quota_storage_size=%{ldap:mailuserquota}" \
 		-e LDAP_DOVECOT_USER_FILTER="(&(mail=%{user})(objectClass=mailAccount))" \
-		-e LDAP_DOVECOT_PASS_ATTRS="user=%{ldap:mail},password=%{ldap:userPassword}" \
+		-e LDAP_DOVECOT_PASS_ATTRS="user=%{ldap:mail}" \
 		-e LDAP_DOVECOT_PASS_FILTER="(&(mail=%{user})(objectClass=mailAccount))" \
 		-e LDAP_DOVECOT_ITERATE_ATTRS="user=%{ldap:mail}" \
 		-e LDAP_DOVECOT_ITERATE_FILTER="(objectClass=mailAccount)" \
@@ -170,12 +170,12 @@ init_ldap2: init_openldap init_redis
 		-e LDAP_SENDER_ATTRIBUTE="mail" \
 		-e LDAP_DOVECOT_USER_ATTRS="home=/var/mail/vhosts/%{user|domain}/%{user|username}/,mail_driver=maildir,mail_path=/var/mail/vhosts/%{user|domain}/%{user|username}/mail/,quota_storage_size=%{ldap:mailuserquota}" \
 		-e LDAP_DOVECOT_USER_FILTER="(&(mail=%{user})(objectClass=mailAccount))" \
-		-e LDAP_DOVECOT_PASS_ATTRS="user=%{ldap:mail},password=%{ldap:userPassword}" \
+		-e LDAP_DOVECOT_PASS_ATTRS="user=%{ldap:mail}" \
 		-e LDAP_DOVECOT_PASS_FILTER="(&(mail=%{user})(objectClass=mailAccount))" \
 		-e LDAP_DOVECOT_ITERATE_ATTRS="user=%{ldap:mail}" \
 		-e LDAP_DOVECOT_ITERATE_FILTER="(objectClass=mailAccount)" \
 		-e LDAP_MASTER_USER_ENABLED=true \
-		-e LDAP_DOVECOT_MASTER_PASS_ATTRS="user=%{ldap:mail},password=%{ldap:userPassword}" \
+		-e LDAP_DOVECOT_MASTER_PASS_ATTRS="user=%{ldap:mail}" \
 		-e LDAP_DOVECOT_MASTER_PASS_FILTER="(&(mail=%{user})(st=%{login_user})(objectClass=mailAccount))" \
 		-e DISABLE_CLAMAV=true \
 		-e DISABLE_SIEVE=true \

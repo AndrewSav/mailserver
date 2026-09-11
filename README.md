@@ -850,7 +850,7 @@ Then you also have to provide the lookups for Dovecot. These will probably be si
 ```
 LDAP_DOVECOT_USER_ATTRS="home=/var/mail/vhosts/%{user|domain}/%{user|username}/,mail_driver=maildir,mail_path=/var/mail/vhosts/%{user|domain}/%{user|username}/mail/,quota_storage_size=%{ldap:mailuserquota}"
 LDAP_DOVECOT_USER_FILTER="(&(mail=%{user})(objectClass=mailAccount))"
-LDAP_DOVECOT_PASS_ATTRS="user=%{ldap:mail},password=%{ldap:userPassword}"
+LDAP_DOVECOT_PASS_ATTRS="user=%{ldap:mail}"
 LDAP_DOVECOT_PASS_FILTER="(&(mail=%{user})(objectClass=mailAccount))"
 LDAP_DOVECOT_ITERATE_ATTRS="user=%{ldap:mail}"
 LDAP_DOVECOT_ITERATE_FILTER="(objectClass=mailAccount)"
@@ -862,7 +862,11 @@ separated list of `dovecot_field=value` pairs that is written into Dovecot's
 `fields { }` block, where an LDAP attribute is referenced as `%{ldap:attribute}`
 rather than mapped from the left hand side. Individual values may not contain a
 comma. In the filters, `%u` becomes `%{user}`, `%d` becomes `%{user|domain}` and
-`%n` becomes `%{user|username}`. A 2.3 style value makes Dovecot fail to start
+`%n` becomes `%{user|username}`. With **LDAP_BIND** set to *true* (the default)
+do not map a password field: Dovecot authenticates by binding as the user, and
+2.4 logs an error for every login if the mapped attribute is not returned by
+the server, which is the normal case for `userPassword`. Map it only when
+**LDAP_BIND** is *false*, where the hash is compared locally. A 2.3 style value makes Dovecot fail to start
 with `Unknown setting`, so these need converting before upgrading. The settings
 that can be returned are listed under
 https://doc.dovecot.org/2.4.1/core/config/auth/userdb.html and
@@ -872,7 +876,7 @@ This mailserver also supports the user of master users that are allowed to log i
 
 ```
 LDAP_MASTER_USER_ENABLED=true
-LDAP_DOVECOT_MASTER_PASS_ATTRS="user=%{ldap:mail},password=%{ldap:userPassword}"
+LDAP_DOVECOT_MASTER_PASS_ATTRS="user=%{ldap:mail}"
 LDAP_DOVECOT_MASTER_PASS_FILTER="(&(mail=%{user})(st=%{login_user})(objectClass=mailAccount))"
 ```
 
