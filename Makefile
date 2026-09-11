@@ -139,17 +139,17 @@ fixtures_ldap:
 	# Wait for rspamd to start (ldap)
 	docker exec mailserver_ldap /bin/sh -c "while ! echo PING | nc -z 0.0.0.0 11332 ; do sleep 1 ; done"
 
-	docker exec mailserver_ldap /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-to-existing-user.txt"
-	docker exec mailserver_ldap /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-to-existing-user-spam-learning.txt"
-	docker exec mailserver_ldap /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-to-valid-user-subaddress.txt"
-	docker exec mailserver_ldap /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-to-non-existing-user.txt"
-	docker exec mailserver_ldap /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-to-existing-alias.txt"
-	docker exec mailserver_ldap /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-to-existing-alias-forward.txt"
-	docker exec mailserver_ldap /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-to-existing-alias-group.txt"
-	docker exec mailserver_ldap /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-spam-to-existing-user.txt"
-	docker exec mailserver_ldap /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-virus-to-existing-user.txt"
-	docker exec mailserver_ldap /bin/sh -c "openssl s_client -ign_eof -connect 0.0.0.0:587 -starttls smtp < /tmp/tests/email-templates/internal-user-to-existing-user.txt"
-	docker exec mailserver_ldap /bin/sh -c "openssl s_client -ign_eof -connect 0.0.0.0:587 -starttls smtp < /tmp/tests/email-templates/internal-rejected-user-to-existing-user.txt"
+	docker exec mailserver_ldap /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-to-existing-user.txt"
+	docker exec mailserver_ldap /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-to-existing-user-spam-learning.txt"
+	docker exec mailserver_ldap /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-to-valid-user-subaddress.txt"
+	docker exec mailserver_ldap /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-to-non-existing-user.txt"
+	docker exec mailserver_ldap /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-to-existing-alias.txt"
+	docker exec mailserver_ldap /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-to-existing-alias-forward.txt"
+	docker exec mailserver_ldap /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-to-existing-alias-group.txt"
+	docker exec mailserver_ldap /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-spam-to-existing-user.txt"
+	docker exec mailserver_ldap /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-virus-to-existing-user.txt"
+	docker exec mailserver_ldap /bin/sh -c "python3 /tmp/tests/smtp-send.py --starttls 0.0.0.0 587 /tmp/tests/email-templates/internal-user-to-existing-user.txt"
+	docker exec mailserver_ldap /bin/sh -c "python3 /tmp/tests/smtp-send.py --starttls 0.0.0.0 587 /tmp/tests/email-templates/internal-rejected-user-to-existing-user.txt"
 	# Wait until postfix has delivered everything it accepted
 	@echo "Waiting for the postfix queue to drain (mailserver_ldap) ..."
 	@timeout $(WAIT_TIMEOUT) sh -c 'until [ -z "$$(docker exec mailserver_ldap find /var/spool/postfix/incoming /var/spool/postfix/active /var/spool/postfix/maildrop -type f 2>/dev/null)" ]; do sleep 2; done' \
@@ -220,13 +220,13 @@ fixtures_ldap2:
 	docker exec mailserver_ldap2 /bin/sh -c "while ! echo PING | nc -z 0.0.0.0 11332 ; do sleep 1 ; done"  # rspamd
 	docker exec mailserver_ldap2 /bin/sh -c "while ! echo PING | nc -z 0.0.0.0 993 ; do sleep 1 ; done"  # dovecot imaps
 	docker exec mailserver_ldap2 /bin/sh -c "while ! echo PING | nc -z 0.0.0.0 587 ; do sleep 1 ; done"  # submission
-	docker exec mailserver_ldap2 /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-to-existing-user.txt"
-	docker exec mailserver_ldap2 /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-to-valid-user-subaddress.txt"
-	docker exec mailserver_ldap2 /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-to-non-existing-user.txt"
-	docker exec mailserver_ldap2 /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-to-existing-alias.txt"
-	docker exec mailserver_ldap2 /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-to-existing-alias-forward.txt"
-	docker exec mailserver_ldap2 /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-to-existing-alias-group.txt"
-	docker exec mailserver_ldap2 /bin/sh -c "openssl s_client -ign_eof -connect 0.0.0.0:587 -starttls smtp < /tmp/tests/email-templates/internal-user-to-existing-user.txt"
+	docker exec mailserver_ldap2 /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-to-existing-user.txt"
+	docker exec mailserver_ldap2 /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-to-valid-user-subaddress.txt"
+	docker exec mailserver_ldap2 /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-to-non-existing-user.txt"
+	docker exec mailserver_ldap2 /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-to-existing-alias.txt"
+	docker exec mailserver_ldap2 /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-to-existing-alias-forward.txt"
+	docker exec mailserver_ldap2 /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-to-existing-alias-group.txt"
+	docker exec mailserver_ldap2 /bin/sh -c "python3 /tmp/tests/smtp-send.py --starttls 0.0.0.0 587 /tmp/tests/email-templates/internal-user-to-existing-user.txt"
 	# Wait until postfix has delivered everything it accepted
 	@echo "Waiting for the postfix queue to drain (mailserver_ldap2) ..."
 	@timeout $(WAIT_TIMEOUT) sh -c 'until [ -z "$$(docker exec mailserver_ldap2 find /var/spool/postfix/incoming /var/spool/postfix/active /var/spool/postfix/maildrop -type f 2>/dev/null)" ]; do sleep 2; done' \
@@ -308,12 +308,12 @@ fixtures_reverse:
 	docker exec mailserver_reverse /bin/sh -c "while ! echo PING | nc -z 0.0.0.0 11332 ; do sleep 1 ; done"  # rspamd
 	docker exec mailserver_reverse /bin/sh -c "while ! echo PING | nc -z 0.0.0.0 993 ; do sleep 1 ; done"  # dovecot imaps
 	docker exec mailserver_reverse /bin/sh -c "while ! echo PING | nc -z 0.0.0.0 587 ; do sleep 1 ; done"  # submission
-	docker exec mailserver_reverse /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-to-existing-user.txt"
-	docker exec mailserver_reverse /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-to-valid-user-subaddress-with-default-separator.txt"
-	docker exec mailserver_reverse /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-to-non-existing-user.txt"
-	docker exec mailserver_reverse /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-to-existing-alias.txt"
-	docker exec mailserver_reverse /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-spam-to-existing-user.txt"
-	docker exec mailserver_reverse /bin/sh -c "openssl s_client -ign_eof -connect 0.0.0.0:587 -starttls smtp < /tmp/tests/email-templates/internal-user-to-existing-user.txt"
+	docker exec mailserver_reverse /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-to-existing-user.txt"
+	docker exec mailserver_reverse /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-to-valid-user-subaddress-with-default-separator.txt"
+	docker exec mailserver_reverse /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-to-non-existing-user.txt"
+	docker exec mailserver_reverse /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-to-existing-alias.txt"
+	docker exec mailserver_reverse /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-spam-to-existing-user.txt"
+	docker exec mailserver_reverse /bin/sh -c "python3 /tmp/tests/smtp-send.py --starttls 0.0.0.0 587 /tmp/tests/email-templates/internal-user-to-existing-user.txt"
 	# Wait until postfix has delivered everything it accepted
 	@echo "Waiting for the postfix queue to drain (mailserver_reverse) ..."
 	@timeout $(WAIT_TIMEOUT) sh -c 'until [ -z "$$(docker exec mailserver_reverse find /var/spool/postfix/incoming /var/spool/postfix/active /var/spool/postfix/maildrop -type f 2>/dev/null)" ]; do sleep 2; done' \
@@ -410,15 +410,15 @@ fixtures_default:
 	# Wait for rspamd to start (default)
 	docker exec mailserver_default /bin/sh -c "while ! echo PING | nc -z 0.0.0.0 11332 ; do sleep 1 ; done"
 
-	docker exec mailserver_default /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-to-existing-user.txt"
-	docker exec mailserver_default /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-to-existing-user-spam-learning.txt"
-	docker exec mailserver_default /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-to-valid-user-subaddress.txt"
-	docker exec mailserver_default /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-to-non-existing-user.txt"
-	docker exec mailserver_default /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-to-existing-alias.txt"
-	docker exec mailserver_default /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-spam-to-existing-user.txt"
-	docker exec mailserver_default /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-virus-to-existing-user.txt"
-	docker exec mailserver_default /bin/sh -c "openssl s_client -ign_eof -connect 0.0.0.0:587 -starttls smtp < /tmp/tests/email-templates/internal-user-to-existing-user.txt"
-	docker exec mailserver_default /bin/sh -c "openssl s_client -ign_eof -connect 0.0.0.0:587 -starttls smtp < /tmp/tests/email-templates/internal-rejected-user-to-existing-user.txt"
+	docker exec mailserver_default /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-to-existing-user.txt"
+	docker exec mailserver_default /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-to-existing-user-spam-learning.txt"
+	docker exec mailserver_default /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-to-valid-user-subaddress.txt"
+	docker exec mailserver_default /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-to-non-existing-user.txt"
+	docker exec mailserver_default /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-to-existing-alias.txt"
+	docker exec mailserver_default /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-spam-to-existing-user.txt"
+	docker exec mailserver_default /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-virus-to-existing-user.txt"
+	docker exec mailserver_default /bin/sh -c "python3 /tmp/tests/smtp-send.py --starttls 0.0.0.0 587 /tmp/tests/email-templates/internal-user-to-existing-user.txt"
+	docker exec mailserver_default /bin/sh -c "python3 /tmp/tests/smtp-send.py --starttls 0.0.0.0 587 /tmp/tests/email-templates/internal-rejected-user-to-existing-user.txt"
 	# Wait until postfix has delivered everything it accepted
 	@echo "Waiting for the postfix queue to drain (mailserver_default) ..."
 	@timeout $(WAIT_TIMEOUT) sh -c 'until [ -z "$$(docker exec mailserver_default find /var/spool/postfix/incoming /var/spool/postfix/active /var/spool/postfix/maildrop -type f 2>/dev/null)" ]; do sleep 2; done' \
@@ -468,15 +468,15 @@ fixtures_sieve:
 	# Wait for rspamd to start (sieve)
 	docker exec mailserver_sieve /bin/sh -c "while ! echo PING | nc -z 0.0.0.0 11332 ; do sleep 1 ; done"
 
-	docker exec mailserver_sieve /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-to-existing-user.txt"
-	docker exec mailserver_sieve /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-to-existing-user-spam-learning.txt"
-	docker exec mailserver_sieve /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-to-valid-user-subaddress.txt"
-	docker exec mailserver_sieve /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-to-non-existing-user.txt"
-	docker exec mailserver_sieve /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-to-existing-alias.txt"
-	docker exec mailserver_sieve /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-spam-to-existing-user.txt"
-	docker exec mailserver_sieve /bin/sh -c "nc 0.0.0.0 25 < /tmp/tests/email-templates/external-virus-to-existing-user.txt"
-	docker exec mailserver_sieve /bin/sh -c "openssl s_client -ign_eof -connect 0.0.0.0:587 -starttls smtp < /tmp/tests/email-templates/internal-user-to-existing-user.txt"
-	docker exec mailserver_sieve /bin/sh -c "openssl s_client -ign_eof -connect 0.0.0.0:587 -starttls smtp < /tmp/tests/email-templates/internal-rejected-user-to-existing-user.txt"
+	docker exec mailserver_sieve /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-to-existing-user.txt"
+	docker exec mailserver_sieve /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-to-existing-user-spam-learning.txt"
+	docker exec mailserver_sieve /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-to-valid-user-subaddress.txt"
+	docker exec mailserver_sieve /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-to-non-existing-user.txt"
+	docker exec mailserver_sieve /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-to-existing-alias.txt"
+	docker exec mailserver_sieve /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-spam-to-existing-user.txt"
+	docker exec mailserver_sieve /bin/sh -c "python3 /tmp/tests/smtp-send.py 0.0.0.0 25 /tmp/tests/email-templates/external-virus-to-existing-user.txt"
+	docker exec mailserver_sieve /bin/sh -c "python3 /tmp/tests/smtp-send.py --starttls 0.0.0.0 587 /tmp/tests/email-templates/internal-user-to-existing-user.txt"
+	docker exec mailserver_sieve /bin/sh -c "python3 /tmp/tests/smtp-send.py --starttls 0.0.0.0 587 /tmp/tests/email-templates/internal-rejected-user-to-existing-user.txt"
 
 	# Wait until postfix has delivered everything it accepted
 	@echo "Waiting for the postfix queue to drain (mailserver_sieve) ..."
