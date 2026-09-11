@@ -416,7 +416,7 @@ load 'test_helper/bats-assert/load'
 @test "checking dovecot: login_greeting value (reverse configuration)" {
   run docker exec mailserver_reverse /bin/sh -c "doveconf -h login_greeting 2>/dev/null"
   assert_success
-  assert_output "Dovecot (Debian) ready."
+  assert_output "Dovecot ready."
 }
 
 @test "checking dovecot: quota dict pgsql (reverse configuration)" {
