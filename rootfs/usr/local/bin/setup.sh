@@ -237,13 +237,11 @@ _envtpl /etc/postfix/sql/virtual-alias-domain-catchall-maps.cf
 
 _envtpl /etc/postfixadmin/fetchmail.conf
 
-_envtpl /etc/dovecot/dovecot-sql.conf.ext
-_envtpl /etc/dovecot/dovecot-dict-sql.conf.ext
-
 _envtpl /etc/dovecot/conf.d/10-auth.conf
 _envtpl /etc/dovecot/conf.d/10-mail.conf
 _envtpl /etc/dovecot/conf.d/10-ssl.conf
 _envtpl /etc/dovecot/conf.d/15-lda.conf
+_envtpl /etc/dovecot/conf.d/20-imap.conf
 _envtpl /etc/dovecot/conf.d/20-lmtp.conf
 _envtpl /etc/dovecot/conf.d/90-quota.conf
 
@@ -267,10 +265,9 @@ if [ "$DBDRIVER" = "ldap" ]; then
   _envtpl /etc/postfix/ldap/virtual-forward-maps.cf
   _envtpl /etc/postfix/ldap/virtual-group-maps.cf
 
-  _envtpl /etc/dovecot/dovecot-ldap.conf.ext
-  _envtpl /etc/dovecot/dovecot-ldap-master.conf.ext
-
   _envtpl /etc/dovecot/conf.d/auth-ldap.conf.ext
+
+  rm -f /etc/dovecot/conf.d/auth-sql.conf.ext
 
 else
 
@@ -280,9 +277,9 @@ else
         /etc/postfix/ldap/virtual-alias-maps.cf \
         /etc/postfix/ldap/virtual-forward-maps.cf \
         /etc/postfix/ldap/virtual-group-maps.cf \
-        /etc/dovecot/dovecot-ldap.conf.ext \
-        /etc/dovecot/dovecot-ldap-master.conf.ext \
         /etc/dovecot/conf.d/auth-ldap.conf.ext
+
+  _envtpl /etc/dovecot/conf.d/auth-sql.conf.ext
 
 fi
 

@@ -420,7 +420,7 @@ load 'test_helper/bats-assert/load'
 }
 
 @test "checking dovecot: quota dict pgsql (reverse configuration)" {
-  run docker exec mailserver_reverse /bin/sh -c "doveconf dict sqlquota 2>/dev/null | grep 'pgsql'"
+  run docker exec mailserver_reverse /bin/sh -c "doveconf dict_server 2>/dev/null | grep 'pgsql'"
   assert_success
 }
 

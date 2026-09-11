@@ -572,7 +572,7 @@ load 'test_helper/bats-assert/load'
 }
 
 @test "checking dovecot: password scheme is correct" {
-  run docker exec mailserver_default /bin/sh -c "grep 'SHA512-CRYPT' /etc/dovecot/dovecot-sql.conf.ext | wc -l"
+  run docker exec mailserver_default /bin/sh -c "grep 'SHA512-CRYPT' /etc/dovecot/conf.d/auth-sql.conf.ext | wc -l"
   assert_success
   assert_output 1
 }
@@ -596,7 +596,7 @@ load 'test_helper/bats-assert/load'
 }
 
 @test "checking dovecot: quota dict mysql (default configuration)" {
-  run docker exec mailserver_default /bin/sh -c "doveconf dict sqlquota 2>/dev/null | grep 'mysql'"
+  run docker exec mailserver_default /bin/sh -c "doveconf dict_server 2>/dev/null | grep 'mysql'"
   assert_success
 }
 
@@ -616,9 +616,9 @@ load 'test_helper/bats-assert/load'
   run docker exec mailserver_default /bin/sh -c "doveconf -h mail_debug 2>/dev/null"
   assert_success
   assert_output "no"
-  run docker exec mailserver_default /bin/sh -c "doveconf -h verbose_ssl 2>/dev/null"
+  run docker exec mailserver_default /bin/sh -c "doveconf -h log_debug 2>/dev/null"
   assert_success
-  assert_output "no"
+  assert_output ""
 }
 
 #
