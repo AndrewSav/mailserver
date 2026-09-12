@@ -355,7 +355,9 @@ if [ "$DEBUG_MODE" != false ]; then
   fi
   if [[ "$DEBUG_MODE" = *"dovecot"* || "$DEBUG_MODE" = true ]]; then
     echo "[INFO] Dovecot debug mode is enabled"
-    sed -i 's/^#//g' /etc/dovecot/conf.d/10-logging.conf
+    # only uncomment actual settings, so explanatory comments in the file
+    # do not turn into invalid configuration lines
+    sed -i -E 's/^#([a-z_]+ =)/\1/' /etc/dovecot/conf.d/10-logging.conf
   fi
   if [[ "$DEBUG_MODE" = *"rspamd"* || "$DEBUG_MODE" = true ]]; then
     echo "[INFO] Rspamd debug mode is enabled"
